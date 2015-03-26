@@ -1,0 +1,112 @@
+# using tanh instead of sigmoid
+
+... loading data ("data/training.data")
+... loading data ("data/test.data")
+... loading model (380-100-3)
+... training model (batch_size = 20)
+epoch  1/100. Q3_train: 63.777%, Q3_test: 62.880%
+epoch  2/100. Q3_train: 64.722%, Q3_test: 65.425%
+epoch  3/100. Q3_train: 65.785%, Q3_test: 65.936%
+epoch  4/100. Q3_train: 66.434%, Q3_test: 66.057%
+epoch  5/100. Q3_train: 66.876%, Q3_test: 66.162%
+epoch  6/100. Q3_train: 67.197%, Q3_test: 66.273%
+epoch  7/100. Q3_train: 67.443%, Q3_test: 66.336%
+epoch  8/100. Q3_train: 67.638%, Q3_test: 66.405%
+epoch  9/100. Q3_train: 67.800%, Q3_test: 66.424%
+epoch 10/100. Q3_train: 67.937%, Q3_test: 66.436%
+epoch 11/100. Q3_train: 68.059%, Q3_test: 66.443%
+epoch 12/100. Q3_train: 68.166%, Q3_test: 66.456%
+epoch 13/100. Q3_train: 68.262%, Q3_test: 66.444%
+epoch 14/100. Q3_train: 68.349%, Q3_test: 66.446%
+epoch 15/100. Q3_train: 68.428%, Q3_test: 66.433%
+epoch 16/100. Q3_train: 68.500%, Q3_test: 66.411%
+epoch 17/100. Q3_train: 68.567%, Q3_test: 66.407%
+epoch 18/100. Q3_train: 68.628%, Q3_test: 66.400%
+epoch 19/100. Q3_train: 68.685%, Q3_test: 66.400%
+epoch 20/100. Q3_train: 68.738%, Q3_test: 66.400%
+epoch 21/100. Q3_train: 68.788%, Q3_test: 66.399%
+epoch 22/100. Q3_train: 68.835%, Q3_test: 66.409%
+epoch 23/100. Q3_train: 68.880%, Q3_test: 66.417%
+epoch 24/100. Q3_train: 68.923%, Q3_test: 66.415%
+epoch 25/100. Q3_train: 68.964%, Q3_test: 66.395%
+epoch 26/100. Q3_train: 69.002%, Q3_test: 66.391%
+epoch 27/100. Q3_train: 69.039%, Q3_test: 66.395%
+epoch 28/100. Q3_train: 69.074%, Q3_test: 66.370%
+epoch 29/100. Q3_train: 69.108%, Q3_test: 66.377%
+epoch 30/100. Q3_train: 69.141%, Q3_test: 66.365%
+epoch 31/100. Q3_train: 69.172%, Q3_test: 66.358%
+epoch 32/100. Q3_train: 69.203%, Q3_test: 66.349%
+epoch 33/100. Q3_train: 69.232%, Q3_test: 66.344%
+epoch 34/100. Q3_train: 69.261%, Q3_test: 66.348%
+epoch 35/100. Q3_train: 69.288%, Q3_test: 66.338%
+epoch 36/100. Q3_train: 69.315%, Q3_test: 66.338%
+epoch 37/100. Q3_train: 69.340%, Q3_test: 66.324%
+epoch 38/100. Q3_train: 69.365%, Q3_test: 66.342%
+epoch 39/100. Q3_train: 69.389%, Q3_test: 66.339%
+epoch 40/100. Q3_train: 69.412%, Q3_test: 66.337%
+epoch 41/100. Q3_train: 69.434%, Q3_test: 66.336%
+epoch 42/100. Q3_train: 69.455%, Q3_test: 66.339%
+epoch 43/100. Q3_train: 69.476%, Q3_test: 66.344%
+epoch 44/100. Q3_train: 69.496%, Q3_test: 66.338%
+epoch 45/100. Q3_train: 69.515%, Q3_test: 66.343%
+epoch 46/100. Q3_train: 69.535%, Q3_test: 66.335%
+epoch 47/100. Q3_train: 69.553%, Q3_test: 66.341%
+epoch 48/100. Q3_train: 69.571%, Q3_test: 66.346%
+epoch 49/100. Q3_train: 69.588%, Q3_test: 66.351%
+epoch 50/100. Q3_train: 69.605%, Q3_test: 66.359%
+epoch 51/100. Q3_train: 69.621%, Q3_test: 66.374%
+epoch 52/100. Q3_train: 69.636%, Q3_test: 66.377%
+epoch 53/100. Q3_train: 69.652%, Q3_test: 66.385%
+epoch 54/100. Q3_train: 69.666%, Q3_test: 66.385%
+epoch 55/100. Q3_train: 69.681%, Q3_test: 66.397%
+epoch 56/100. Q3_train: 69.695%, Q3_test: 66.400%
+epoch 57/100. Q3_train: 69.708%, Q3_test: 66.402%
+epoch 58/100. Q3_train: 69.722%, Q3_test: 66.409%
+epoch 59/100. Q3_train: 69.735%, Q3_test: 66.410%
+epoch 60/100. Q3_train: 69.747%, Q3_test: 66.415%
+epoch 61/100. Q3_train: 69.759%, Q3_test: 66.426%
+epoch 62/100. Q3_train: 69.771%, Q3_test: 66.436%
+epoch 63/100. Q3_train: 69.783%, Q3_test: 66.447%
+epoch 64/100. Q3_train: 69.794%, Q3_test: 66.454%
+epoch 65/100. Q3_train: 69.805%, Q3_test: 66.465%
+epoch 66/100. Q3_train: 69.816%, Q3_test: 66.473%
+epoch 67/100. Q3_train: 69.826%, Q3_test: 66.483%
+epoch 68/100. Q3_train: 69.837%, Q3_test: 66.498%
+epoch 69/100. Q3_train: 69.847%, Q3_test: 66.500%
+epoch 70/100. Q3_train: 69.856%, Q3_test: 66.511%
+epoch 71/100. Q3_train: 69.866%, Q3_test: 66.526%
+epoch 72/100. Q3_train: 69.875%, Q3_test: 66.536%
+epoch 73/100. Q3_train: 69.885%, Q3_test: 66.555%
+epoch 74/100. Q3_train: 69.894%, Q3_test: 66.559%
+epoch 75/100. Q3_train: 69.903%, Q3_test: 66.572%
+epoch 76/100. Q3_train: 69.911%, Q3_test: 66.584%
+epoch 77/100. Q3_train: 69.920%, Q3_test: 66.589%
+epoch 78/100. Q3_train: 69.928%, Q3_test: 66.603%
+epoch 79/100. Q3_train: 69.936%, Q3_test: 66.616%
+epoch 80/100. Q3_train: 69.944%, Q3_test: 66.638%
+epoch 81/100. Q3_train: 69.952%, Q3_test: 66.640%
+epoch 82/100. Q3_train: 69.960%, Q3_test: 66.646%
+epoch 83/100. Q3_train: 69.968%, Q3_test: 66.648%
+epoch 84/100. Q3_train: 69.975%, Q3_test: 66.664%
+epoch 85/100. Q3_train: 69.982%, Q3_test: 66.679%
+epoch 86/100. Q3_train: 69.990%, Q3_test: 66.688%
+epoch 87/100. Q3_train: 69.997%, Q3_test: 66.689%
+epoch 88/100. Q3_train: 70.004%, Q3_test: 66.697%
+epoch 89/100. Q3_train: 70.011%, Q3_test: 66.696%
+epoch 90/100. Q3_train: 70.017%, Q3_test: 66.698%
+epoch 91/100. Q3_train: 70.024%, Q3_test: 66.693%
+epoch 92/100. Q3_train: 70.031%, Q3_test: 66.697%
+epoch 93/100. Q3_train: 70.037%, Q3_test: 66.698%
+epoch 94/100. Q3_train: 70.043%, Q3_test: 66.695%
+epoch 95/100. Q3_train: 70.049%, Q3_test: 66.700%
+epoch 96/100. Q3_train: 70.056%, Q3_test: 66.700%
+epoch 97/100. Q3_train: 70.062%, Q3_test: 66.695%
+epoch 98/100. Q3_train: 70.067%, Q3_test: 66.702%
+epoch 99/100. Q3_train: 70.073%, Q3_test: 66.706%
+epoch 100/100. Q3_train: 70.079%, Q3_test: 66.705%
+
+Done!
+
+real    73m4.269s
+user    72m51.818s
+sys 0m4.834s
