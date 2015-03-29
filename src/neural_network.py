@@ -11,7 +11,6 @@ def floatX(X):
 
 def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
                 L1_reg=0.00, L2_reg=0.0001):
-    print '... loading model (%d-%d-%d)' % (window_size*20, hidden_layer_size, 3)
 
     def init_weights_sigmoid(shape):
         return theano.shared(
@@ -40,6 +39,8 @@ def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
     def model(X, w_h, b_h, w_o, b_o):
         h = T.nnet.sigmoid(T.dot(X, w_h) + b_h)
         return T.nnet.softmax(T.dot(h, w_o) + b_o)
+
+    print '... loading model (%d-%d-%d)' % (window_size*20, hidden_layer_size, 3)
 
     X = T.matrix()
     Y = T.matrix()
@@ -88,6 +89,16 @@ def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
 
 
 def train_model(num_epochs=10, batch_size=1):
+
+    def init_accuracy_table():
+        return np.zeros(shape=(3,3), dtype=float)
+
+    def calc_accuracy_table(Y_pred, Y_obs):
+        A = init_accuracy_table()
+        for i in range(len(Y_pred)):
+            A[Y_obs[i]][Y_pred[i]] += 1
+        return A
+
     print '... training model (batch_size = %d)' % batch_size
 
     m_train = X_train.get_value(borrow=True).shape[0]
@@ -97,16 +108,18 @@ def train_model(num_epochs=10, batch_size=1):
     ends = range(batch_size, m_train, batch_size)
 
     for i in range(num_epochs):
-        Q3 = []
+        A_train = init_accuracy_table()
         for start, end in zip(starts, ends):
-            Y_predicted = train(start, end)
-            Y_desired = np.argmax(Y_train.get_value(borrow=True)[start:end], axis=1)
-            Q3.append(np.mean(Y_desired == Y_predicted))
-        Q3_train = np.mean(Q3)
-        Y_predicted = predict(0, m_test)
-        Y_desired = np.argmax(Y_test.get_value(borrow=True), axis=1)
-        Q3_test = np.mean(Y_desired == Y_predicted)
-        print 'epoch %2d/%d. Q3_train: %.3f%%, Q3_test: %.3f%%' % \
+            Y_pred = train(start, end)
+            Y_obs = np.argmax(Y_train.get_value(borrow=True)[start:end], axis=1)
+            A_train += calc_accuracy_table(Y_pred, Y_obs)
+        Q3_train = A_train.trace() / A_train.sum()
+
+        Y_pred = predict(0, m_test)
+        Y_obs = np.argmax(Y_test.get_value(borrow=True), axis=1)
+        A_test = calc_accuracy_table(Y_pred, Y_obs)
+        Q3_test = A_test.trace() / A_test.sum()
+        print 'epoch %2d/%d. Q3_train: %.3f%%,Q3_test: %.3f%%' % \
             (i+1, num_epochs, Q3_train*100., Q3_test*100.)
 
 
