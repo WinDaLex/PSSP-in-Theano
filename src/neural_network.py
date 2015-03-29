@@ -13,27 +13,24 @@ def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
                 L1_reg=0.00, L2_reg=0.0001):
 
     def init_weights_sigmoid(shape):
-        return theano.shared(
-            floatX(np.random.uniform(
-                low=-np.sqrt(6./(shape[0]+shape[1]))*4.,
-                high=np.sqrt(6./(shape[0]+shape[1]))*4.,
-                size=shape)),
-            borrow=True
-        )
+        low = -np.sqrt(6./(shape[0]+shape[1])) * 4.
+        high = np.sqrt(6./(shape[0]+shape[1])) * 4.
+        values = np.random.uniform(low=low, high=high, size=shape)
+        return theano.shared(floatX(values), borrow=True)
 
     def init_weights(shape):
         values = np.random.randn(*shape)*0.01
         return theano.shared(floatX(values), borrow=True)
 
     def init_bias(shape):
-        values = np.zeros((shape,), dtype=theano.config.floatX)
+        values = np.zeros(shape, dtype=theano.config.floatX)
         return theano.shared(values, borrow=True)
 
     def sgd(cost, params):
         grads = T.grad(cost=cost, wrt=params)
         updates = []
         for param, grad in zip(params, grads):
-            updates.append([param, param - grad * learning_rate])
+            updates.append([param, param - learning_rate*grad])
         return updates
 
     def model(X, w_h, b_h, w_o, b_o):
@@ -58,7 +55,8 @@ def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
     NLL = -T.mean(T.log(py_x)[T.arange(Y.shape[0]), T.argmax(Y, axis=1)])
     L1 = T.sum(abs(w_h)) + T.sum(abs(w_o))
     L2_sqr = T.sum((w_h**2)) + T.sum((w_o**2))
-    cost = NLL + L1_reg * L1 + L2_reg * L2_sqr
+    cost = NLL + L1_reg*L1 + L2_reg*L2_sqr
+
     params = [w_h, b_h, w_o, b_o]
     updates = sgd(cost, params)
 
@@ -80,7 +78,7 @@ def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
         inputs=[start, end],
         outputs=y_pred,
         givens={
-            X: X_test[start:end],
+            X: X_test[start:end]
         },
         allow_input_downcast=True
     )
@@ -88,10 +86,10 @@ def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
     return train, predict
 
 
-def train_model(num_epochs=10, batch_size=1):
+def train_model(num_epochs=1, batch_size=1):
 
     def init_accuracy_table():
-        return np.zeros(shape=(3,3), dtype=float)
+        return np.zeros(shape=(3, 3), dtype=float)
 
     def calc_accuracy_table(Y_pred, Y_obs):
         A = init_accuracy_table()
