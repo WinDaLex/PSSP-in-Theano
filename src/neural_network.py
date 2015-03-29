@@ -96,8 +96,8 @@ def train_model(num_epochs=10, batch_size=1):
     starts = range(0, m_train, batch_size)
     ends = range(batch_size, m_train, batch_size)
 
-    Q3 = []
     for i in range(num_epochs):
+        Q3 = []
         for start, end in zip(starts, ends):
             Y_predicted = train(start, end)
             Y_desired = np.argmax(Y_train.get_value(borrow=True)[start:end], axis=1)
