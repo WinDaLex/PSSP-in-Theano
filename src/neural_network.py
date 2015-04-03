@@ -102,14 +102,12 @@ def train_model(num_epochs=1, batch_size=1):
     m_train = X_train.get_value(borrow=True).shape[0]
     m_test = X_test.get_value(borrow=True).shape[0]
 
-    starts = range(0, m_train, batch_size)
-    ends = range(batch_size, m_train, batch_size)
-
+    index = index_train
     for i in range(num_epochs):
         A_train = init_accuracy_table()
-        for start, end in zip(starts, ends):
-            Y_pred = train(start, end)
-            Y_obs = np.argmax(Y_train.get_value(borrow=True)[start:end], axis=1)
+        for j in range(len(index) - 1):
+            Y_pred = train(index[j], index[j+1])
+            Y_obs = np.argmax(Y_train.get_value(borrow=True)[index[j]:index[j+1]], axis=1)
             A_train += calc_accuracy_table(Y_pred, Y_obs)
         Q3_train = A_train.trace() / A_train.sum()
 
@@ -122,10 +120,10 @@ def train_model(num_epochs=1, batch_size=1):
 
 
 def shared_dataset(data_xy, borrow=True):
-    data_x, data_y = data_xy
+    data_x, data_y, index = data_xy
     shared_x = theano.shared(floatX(data_x), borrow=borrow)
     shared_y = theano.shared(floatX(data_y), borrow=borrow)
-    return shared_x, shared_y
+    return shared_x, shared_y, index
 
 
 if __name__ == '__main__':
@@ -136,11 +134,11 @@ if __name__ == '__main__':
     hidden_layer_size = 100
     learning_rate = 0.03
 
-    num_epochs = 10
+    num_epochs = 100
     batch_size = 20
 
-    X_train, Y_train = shared_dataset(data.load(train_file, window_size=window_size))
-    X_test, Y_test = shared_dataset(data.load(test_file, window_size=window_size))
+    X_train, Y_train, index_train = shared_dataset(data.load(train_file, window_size=window_size))
+    X_test, Y_test, index_test = shared_dataset(data.load(test_file, window_size=window_size))
 
     train, predict = build_model(
         window_size=window_size,

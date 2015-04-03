@@ -17,6 +17,7 @@ def load(filename, window_size=19):
 
     X = []
     Y = []
+    index = [0]
     with open(filename, 'r') as f:
         line = f.read().strip().split('\n')
         num_proteins = len(line) / 2
@@ -37,4 +38,6 @@ def load(filename, window_size=19):
 
             Y += [encode_dssp(dssp) for dssp in structure]
 
-    return X, Y
+            index.append(index[-1] + len(sequence))
+
+    return X, Y, index
