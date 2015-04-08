@@ -1,0 +1,8 @@
+RES:P,F,F,F,T,H,Q,K,A,H,W,S,E,S,A,M,A,Y,N,R,T,V,K,Y,P,G,Q,Y,E,G,I,E,E,F,V,K,N,N,P,K,Y,S,F,M,M,E,L,N,N,L,K,L,N,
+DSSP:S,H,H,H,H,T,T,T,_,T,T,_,H,H,H,H,H,H,_,_,_,_,_,S,S,E,E,_,_,S,H,H,H,H,H,H,H,_,G,G,G,G,G,G,G,G,G,T,T,_,E,E,S,
+DSSPACC:b,e,b,b,b,b,b,e,b,e,e,b,e,b,b,e,e,b,e,e,e,b,e,b,e,e,e,b,e,e,b,e,e,b,b,e,e,e,e,e,b,e,e,b,e,e,e,e,e,e,e,b,e,
+STRIDE:T,H,H,H,H,H,T,T,T,T,T,T,H,H,H,H,H,H,C,C,C,C,T,T,T,E,E,T,T,T,H,H,H,H,H,H,H,C,G,G,G,G,G,G,G,G,G,T,T,T,E,E,C,
+RsNo:202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,
+DEFINE:H,H,H,H,H,H,H,_,_,_,_,H,H,H,H,H,H,H,H,E,E,E,E,_,_,_,E,E,E,E,H,H,H,H,H,H,H,H,H,_,_,_,H,H,H,G,G,G,E,E,E,E,E,
+align1:P,F,F,F,T,H,Q,K,A,H,W,S,E,S,A,M,A,Y,N,R,T,V,K,Y,P,G,Q,Y,E,G,I,E,E,F,V,K,N,N,P,K,Y,S,F,M,M,E,L,N,N,L,K,L,N,
+align2:P,F,F,F,T,H,Q,K,A,H,W,S,E,S,A,M,A,Y,N,R,T,V,K,Y,P,G,Q,Y,E,G,I,E,E,F,V,K,N,N,P,K,Y,S,F,M,M,E,L,N,N,L,K,L,N,

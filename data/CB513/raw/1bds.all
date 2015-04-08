@@ -1,0 +1,8 @@
+RES:A,A,P,C,F,C,S,G,K,P,G,R,G,D,L,W,I,L,R,G,T,C,P,G,G,Y,G,Y,T,S,N,C,Y,K,W,P,N,I,C,C,Y,P,H,
+DSSP:_,_,_,_,_,_,S,S,_,_,S,_,_,E,E,E,_,S,_,S,S,_,_,T,T,T,_,_,_,_,E,E,E,E,T,T,E,E,E,E,_,_,_,
+DSSPACC:e,b,e,b,e,b,e,e,e,e,e,e,b,b,e,b,e,e,e,e,e,b,b,e,e,e,e,b,e,e,e,b,e,e,e,e,e,b,b,b,b,e,e,
+STRIDE:C,C,C,E,E,E,T,T,E,E,E,E,E,E,E,E,T,T,T,T,T,T,T,T,T,T,T,C,C,E,E,E,E,E,T,T,E,E,E,E,E,C,C,
+RsNo:1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,
+DEFINE:_,_,E,E,E,E,_,_,_,_,_,_,_,E,E,E,E,E,_,_,_,_,_,_,_,_,_,_,_,_,E,E,E,E,_,_,_,E,E,E,E,E,S,
+align1:A,A,P,C,F,C,S,G,K,P,G,R,G,D,L,W,I,L,R,G,T,C,P,G,G,Y,G,Y,T,S,N,C,Y,K,W,P,N,I,C,C,Y,P,H,
+align2:A,A,P,C,F,C,S,G,K,P,G,R,G,D,L,W,I,L,R,G,T,C,P,G,G,Y,G,Y,T,S,N,C,Y,K,W,P,N,I,C,C,Y,P,H,

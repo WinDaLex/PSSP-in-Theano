@@ -1,0 +1,8 @@
+RES:A,R,R,K,W,Q,K,T,G,H,A,V,R,A,I,G,R,L,S,S,
+DSSP:_,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,T,_,_,
+DSSPACC:b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,e,e,
+STRIDE:C,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,C,C,
+RsNo:796,797,798,799,800,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,
+DEFINE:H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,S,S,
+align1:A,R,R,K,W,Q,K,T,G,H,A,V,R,A,I,G,R,L,S,S,
+align2:I,R,R,K,W,Q,K,T,G,N,A,I,R,A,L,G,R,M,A,N,

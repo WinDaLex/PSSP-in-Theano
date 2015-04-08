@@ -1,0 +1,8 @@
+RES:S,L,E,E,V,A,E,R,V,K,P,F,L,R,E,A,G,L,S,W,E,S,E,A,Y,L,R,R,A,V,E,L,M,R,P,R,F,D,T,L,K,E,F,P,E,K,A,R,
+DSSP:_,H,H,H,H,H,H,H,T,H,H,H,H,H,H,T,T,_,_,_,S,S,H,H,H,H,H,H,H,H,H,H,H,G,G,G,_,S,S,G,G,G,H,H,H,H,T,G,
+DSSPACC:e,b,e,e,b,b,e,b,b,b,e,b,b,e,e,e,e,b,e,b,e,e,e,e,b,b,b,e,b,b,e,b,b,b,e,e,b,b,b,b,e,b,b,b,e,e,b,e,
+STRIDE:C,H,H,H,H,H,H,H,H,H,H,H,H,H,H,C,C,C,C,T,T,T,H,H,H,H,H,H,H,H,H,H,H,H,T,T,T,C,C,C,H,H,H,H,H,H,H,G,
+RsNo:323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,349,350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365,366,367,368,369,370,
+DEFINE:H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,H,_,_,_,_,H,H,H,H,H,H,H,H,H,H,H,H,H,_,_,_,_,_,_,_,H,H,H,H,H,H,H,
+align1:S,L,E,E,V,A,E,R,V,K,P,F,L,R,E,A,G,L,S,W,E,S,E,A,Y,L,R,R,A,V,E,L,M,R,P,R,F,D,T,L,K,E,F,P,E,K,A,R,
+align2:D,L,E,E,V,K,K,K,V,Q,P,Y,L,D,D,F,Q,N,K,W,Q,E,E,M,E,T,Y,R,A,R,Q,K,V,Q,E,L,Q,E,K,L,S,P,L,A,E,E,L,R,
