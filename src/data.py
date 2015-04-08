@@ -41,3 +41,42 @@ def load(filename, window_size=19):
             index.append(index[-1] + len(sequence))
 
     return X, Y, index
+
+
+def scale_func(x):
+    if x < -5:
+        return 0.0
+    elif -5 <= x <= 5:
+        return 0.5 + 0.1*x
+    else:
+        return 1.0
+
+
+def load_pssm(filename, window_size=19, scale=scale_func):
+    print '... loading pssm ("%s")' % filename
+
+    X = []
+    Y = []
+    index = [0]
+    with open(filename, 'r') as f:
+        num_proteins = int(f.readline().strip())
+        for i in range(num_proteins):
+            m = int(f.readline().strip())
+            sequences = []
+            for j in range(m):
+                line = f.readline()
+                sequences += [scale(int(line[k*3:k*3+3])) for k in range(20)]
+
+            double_end = ([0] * 20) * (window_size / 2)
+            sequences = double_end + sequences + double_end
+            X += [
+                sequences[start:start+window_size*20]
+                for start in range(0, m*20, 20)
+            ]
+
+            structure = f.readline().strip()
+            Y += [encode_dssp(dssp) for dssp in structure]
+
+            index.append(index[-1] + m)
+
+    return X, Y, index

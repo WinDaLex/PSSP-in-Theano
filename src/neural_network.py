@@ -102,7 +102,8 @@ def train_model(num_epochs=1, batch_size=1):
     m_train = X_train.get_value(borrow=True).shape[0]
     m_test = X_test.get_value(borrow=True).shape[0]
 
-    index = index_train
+    #index = index_train
+    index = range(0, m_train, 20)
     for i in range(num_epochs):
         A_train = init_accuracy_table()
         for j in range(len(index) - 1):
@@ -127,17 +128,17 @@ def shared_dataset(data_xy, borrow=True):
 
 
 if __name__ == '__main__':
-    train_file = 'data/training10.data'
+    train_file = 'data/RS123_pssm.data'
     test_file = 'data/test10.data'
     window_size = 19
 
     hidden_layer_size = 100
     learning_rate = 0.03
 
-    num_epochs = 100
+    num_epochs = 1000
     batch_size = 20
 
-    X_train, Y_train, index_train = shared_dataset(data.load(train_file, window_size=window_size))
+    X_train, Y_train, index_train = shared_dataset(data.load_pssm(train_file, window_size=window_size))
     X_test, Y_test, index_test = shared_dataset(data.load(test_file, window_size=window_size))
 
     train, predict = build_model(
