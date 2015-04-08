@@ -1,0 +1,16 @@
+seq_1bds:AAPCFCSGKPGRGDLWILRGTCPGGYGYTSNCYKWPNICCYPH
+seq_BDS1_ANESU:AAPCFCSGKPGRGDLWILRGTCPGGYGYTSNCYKWPNICCYPH
+OrigSeq:AAPCFCSGKPGRGDLWILRGTCPGGYGYTSNCYKWPNICCYPH
+cons:-------------EEEEEE------------------------
+dsc:-------------EEEEEE------------------------
+mul:--------------EEEE-------------------EEEE--
+nnssp:--------------EEEE-------------------------
+phd:---EE--------EEEEEE------EEE---------EEE---
+pred:-------------EEEEEEE-----------------------
+zpred:HEEEE--------EEEEE----------EE-------------
+access:EBEBBBEEEEEEE-BBBBEBEBEEE-EBBBEB-EBBBBBB-EE
+PHD:9843317758821278975356798353232347981265179
+Pred:0090000099909808600900000978900000000000000
+dssp:-------------EEE--------------EEEE--EEEE---
+define:--EEEE-------EEEEE------------EEEE---EEEEE-
+stride:---EEE--EEEEEEEE-------------EEEEE--EEEEE--
