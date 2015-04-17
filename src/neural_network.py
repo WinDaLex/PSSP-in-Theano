@@ -1,6 +1,7 @@
 import theano
 import theano.tensor as T
 import numpy as np
+import matplotlib.pyplot as plt
 
 import data
 
@@ -86,7 +87,7 @@ def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
     return train, predict
 
 
-def train_model(num_epochs=1, batch_size=1):
+def train_model(num_epochs=1, batch_size=1, draw=True):
 
     def init_accuracy_table():
         return np.zeros(shape=(3, 3), dtype=float)
@@ -99,11 +100,18 @@ def train_model(num_epochs=1, batch_size=1):
 
     print '... training model (batch_size = %d)' % batch_size
 
+    if draw:
+        plt.axis([0, num_epochs, 55, 85])
+        plt.xlabel('Epoch No.')
+        plt.ylabel('Q3 Accuracy(%)')
+        plt.ion()
+        plt.show()
+
     m_train = X_train.get_value(borrow=True).shape[0]
     m_test = X_test.get_value(borrow=True).shape[0]
 
-    #index = index_train
-    index = range(0, m_train, 20)
+    index = index_train
+    #index = range(0, m_train, 20)
     for i in range(num_epochs):
         A_train = init_accuracy_table()
         for j in range(len(index) - 1):
@@ -119,6 +127,11 @@ def train_model(num_epochs=1, batch_size=1):
         print 'epoch %2d/%d. Q3_train: %.3f%%,Q3_test: %.3f%%' % \
             (i+1, num_epochs, Q3_train*100., Q3_test*100.)
 
+        if draw:
+            plt.scatter(i, Q3_train*100, c=u'b')
+            plt.scatter(i, Q3_test*100, c=u'r')
+            plt.draw()
+
 
 def shared_dataset(data_xy, borrow=True):
     data_x, data_y, index = data_xy
@@ -128,18 +141,18 @@ def shared_dataset(data_xy, borrow=True):
 
 
 if __name__ == '__main__':
-    train_file = 'data/RS123_pssm.data'
-    test_file = 'data/test10.data'
+    train_file = 'data/astral30_pssm.data'
+    test_file = 'data/casp9_pssm.data'
     window_size = 19
 
     hidden_layer_size = 100
     learning_rate = 0.03
 
-    num_epochs = 1000
+    num_epochs = 100
     batch_size = 20
 
     X_train, Y_train, index_train = shared_dataset(data.load_pssm(train_file, window_size=window_size))
-    X_test, Y_test, index_test = shared_dataset(data.load(test_file, window_size=window_size))
+    X_test, Y_test, index_test = shared_dataset(data.load_pssm(test_file, window_size=window_size))
 
     train, predict = build_model(
         window_size=window_size,
