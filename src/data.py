@@ -3,14 +3,11 @@ RESIDUES_CLASS = ('A', 'R', 'N', 'D', 'C', 'E', 'Q', 'G', 'H', 'I', 'L', 'K',
 
 DSSP_CLASS = ('H', 'E', 'C')
 
-
 def encode_residue(residue):
     return [1 if residue == RESIDUES_CLASS[i] else 0 for i in xrange(20)]
 
-
 def encode_dssp(dssp):
     return [1 if dssp == DSSP_CLASS[i] else 0 for i in xrange(3)]
-
 
 def load(filename, window_size=19):
     print '... loading data ("%s")' % filename
@@ -42,15 +39,11 @@ def load(filename, window_size=19):
 
     return X, Y, index
 
-
 def scale_func(x):
-    if x < -5:
-        return 0.0
-    elif -5 <= x <= 5:
-        return 0.5 + 0.1*x
-    else:
-        return 1.0
-
+    if x < -5: y = 0.0
+    elif -5 <= x <= 5: y = 0.5 + 0.1*x
+    else: y = 1.0
+    return y
 
 def load_pssm(filename, window_size=19, scale=scale_func):
     print '... loading pssm ("%s")' % filename
@@ -67,7 +60,7 @@ def load_pssm(filename, window_size=19, scale=scale_func):
                 line = f.readline()
                 sequences += [scale(int(line[k*3:k*3+3])) for k in range(20)]
 
-            double_end = ([0] * 20) * (window_size / 2)
+            double_end = ([0]*20) * (window_size/2)
             sequences = double_end + sequences + double_end
             X += [
                 sequences[start:start+window_size*20]
