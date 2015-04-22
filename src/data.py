@@ -39,13 +39,13 @@ def load(filename, window_size=19):
 
     return X, Y, index
 
-def scale_func(x):
+def piecewise_scaling_func(x):
     if x < -5: y = 0.0
     elif -5 <= x <= 5: y = 0.5 + 0.1*x
     else: y = 1.0
     return y
 
-def load_pssm(filename, window_size=19, scale=scale_func):
+def load_pssm(filename, window_size=19, scale=piecewise_scaling_func):
     print '... loading pssm ("%s")' % filename
 
     X = []
@@ -53,18 +53,18 @@ def load_pssm(filename, window_size=19, scale=scale_func):
     index = [0]
     with open(filename, 'r') as f:
         num_proteins = int(f.readline().strip())
-        for i in range(num_proteins):
+        for __ in xrange(num_proteins):
             m = int(f.readline().strip())
             sequences = []
-            for j in range(m):
+            for __ in xrange(m):
                 line = f.readline()
-                sequences += [scale(int(line[k*3:k*3+3])) for k in range(20)]
+                sequences += [scale(int(line[i*3:i*3+3])) for i in xrange(20)]
 
             double_end = ([0.]*20) * (window_size/2)
             sequences = double_end + sequences + double_end
             X += [
                 sequences[start:start+window_size*20]
-                for start in range(0, m*20, 20)
+                for start in xrange(0, m*20, 20)
             ]
 
             structure = f.readline().strip()
