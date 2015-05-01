@@ -9,7 +9,6 @@ import data
 def floatX(X):
     return np.asarray(X, dtype=theano.config.floatX)
 
-
 def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
                 L1_reg=0.00, L2_reg=0.0001):
 
@@ -87,17 +86,23 @@ def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
     return train, predict
 
 
+class Accuracy():
+
+    def __init__(self, pred=None, obs=None):
+        self.table = np.zeros(shape=(3, 3), dtype=float)
+        if pred is not None and obs is not None:
+            self.count(pred, obs)
+
+    def count(self, pred, obs):
+        for i in range(len(pred)):
+            self.table[obs[i]][pred[i]] += 1
+
+    @property
+    def Q3(self):
+        return self.table.trace() / self.table.sum() * 100
+
+
 def train_model(num_epochs=1, batch_size=1, draw=False):
-
-    def init_accuracy_table():
-        return np.zeros(shape=(3, 3), dtype=float)
-
-    def calc_accuracy_table(Y_pred, Y_obs):
-        A = init_accuracy_table()
-        for i in range(len(Y_pred)):
-            A[Y_obs[i]][Y_pred[i]] += 1
-        return A
-
     print '... training model (batch_size = %d)' % batch_size
 
     if draw:
@@ -110,31 +115,27 @@ def train_model(num_epochs=1, batch_size=1, draw=False):
     m_train = X_train.get_value(borrow=True).shape[0]
     m_test = X_test.get_value(borrow=True).shape[0]
 
-    index = range(0, m_train, batch_size)
+    index = range(0, m_train+1, batch_size)
 
     cost_list = []
     for i in range(num_epochs):
-        A_train = init_accuracy_table()
+        A_train = Accuracy()
         for j in range(len(index) - 1):
             cost, Y_pred = train(index[j], index[j+1])
             cost_list.append(cost)
             Y_obs = np.argmax(Y_train.get_value(borrow=True)[index[j]:index[j+1]], axis=1)
-            A_train += calc_accuracy_table(Y_pred, Y_obs)
-
-        Q3_train = A_train.trace() / A_train.sum()
+            A_train.count(Y_pred, Y_obs)
 
         Y_pred = predict(0, m_test)
         Y_obs = np.argmax(Y_test.get_value(borrow=True), axis=1)
-        A_test = calc_accuracy_table(Y_pred, Y_obs)
-        Q3_test = A_test.trace() / A_test.sum()
+        A_test = Accuracy(Y_pred, Y_obs)
 
         print 'epoch %2d/%d. Loss: %f, Q3_train: %.3f%%, Q3_test: %.3f%%.' % \
-            (i+1, num_epochs, np.average(cost_list), Q3_train*100., Q3_test*100.)
+            (i+1, num_epochs, np.average(cost_list), A_train.Q3, A_test.Q3)
 
         if draw:
             plt.scatter(i, np.average(cost_list))
             plt.draw()
-
 
 def shared_dataset(data_xy, borrow=True):
     data_x, data_y, index = data_xy
@@ -142,16 +143,15 @@ def shared_dataset(data_xy, borrow=True):
     shared_y = theano.shared(floatX(data_y), borrow=borrow)
     return shared_x, shared_y, index
 
-
 if __name__ == '__main__':
-    train_file = 'data/train.pssm'
-    test_file = 'data/valid.pssm'
+    train_file = 'data/astral30_pssm.data'
+    test_file = 'data/astral30_pssm.data'
     window_size = 19
 
     hidden_layer_size = 100
     learning_rate = 0.03
 
-    num_epochs = 100
+    num_epochs = 1000
     batch_size = 20
 
     X_train, Y_train, index_train = shared_dataset(data.load_pssm(train_file, window_size=window_size))
