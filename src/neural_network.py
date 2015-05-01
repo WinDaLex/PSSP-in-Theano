@@ -38,7 +38,7 @@ def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
         h = T.nnet.sigmoid(T.dot(X, w_h) + b_h)
         return T.nnet.softmax(T.dot(h, w_o) + b_o)
 
-    print '... loading model (%d-%d-%d)' % (window_size*20, hidden_layer_size, 3)
+    print '... building model (%d-%d-%d)' % (window_size*20, hidden_layer_size, 3)
 
     X = T.matrix()
     Y = T.matrix()
@@ -66,7 +66,7 @@ def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
 
     train = theano.function(
         inputs=[start, end],
-        outputs=y_pred,
+        outputs=[cost, y_pred],
         updates=updates,
         givens={
             X: X_train[start:end],
@@ -87,7 +87,7 @@ def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
     return train, predict
 
 
-def train_model(num_epochs=1, batch_size=1, draw=True):
+def train_model(num_epochs=1, batch_size=1, draw=False):
 
     def init_accuracy_table():
         return np.zeros(shape=(3, 3), dtype=float)
@@ -101,35 +101,38 @@ def train_model(num_epochs=1, batch_size=1, draw=True):
     print '... training model (batch_size = %d)' % batch_size
 
     if draw:
-        plt.axis([0, num_epochs, 55, 85])
+        plt.axis([0, num_epochs, 0, 2])
         plt.xlabel('Epoch No.')
-        plt.ylabel('Q3 Accuracy(%)')
+        plt.ylabel('Error')
         plt.ion()
         plt.show()
 
     m_train = X_train.get_value(borrow=True).shape[0]
     m_test = X_test.get_value(borrow=True).shape[0]
 
-    index = index_train
-    #index = range(0, m_train, 20)
+    index = range(0, m_train, batch_size)
+
+    cost_list = []
     for i in range(num_epochs):
         A_train = init_accuracy_table()
         for j in range(len(index) - 1):
-            Y_pred = train(index[j], index[j+1])
+            cost, Y_pred = train(index[j], index[j+1])
+            cost_list.append(cost)
             Y_obs = np.argmax(Y_train.get_value(borrow=True)[index[j]:index[j+1]], axis=1)
             A_train += calc_accuracy_table(Y_pred, Y_obs)
+
         Q3_train = A_train.trace() / A_train.sum()
 
         Y_pred = predict(0, m_test)
         Y_obs = np.argmax(Y_test.get_value(borrow=True), axis=1)
         A_test = calc_accuracy_table(Y_pred, Y_obs)
         Q3_test = A_test.trace() / A_test.sum()
-        print 'epoch %2d/%d. Q3_train: %.3f%%,Q3_test: %.3f%%' % \
-            (i+1, num_epochs, Q3_train*100., Q3_test*100.)
+
+        print 'epoch %2d/%d. Loss: %f, Q3_train: %.3f%%, Q3_test: %.3f%%.' % \
+            (i+1, num_epochs, np.average(cost_list), Q3_train*100., Q3_test*100.)
 
         if draw:
-            plt.scatter(i, Q3_train*100, c=u'b')
-            plt.scatter(i, Q3_test*100, c=u'r')
+            plt.scatter(i, np.average(cost_list))
             plt.draw()
 
 
@@ -141,8 +144,8 @@ def shared_dataset(data_xy, borrow=True):
 
 
 if __name__ == '__main__':
-    train_file = 'data/astral30_pssm.data'
-    test_file = 'data/casp9_pssm.data'
+    train_file = 'data/train.pssm'
+    test_file = 'data/valid.pssm'
     window_size = 19
 
     hidden_layer_size = 100
