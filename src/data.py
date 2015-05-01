@@ -58,7 +58,7 @@ def load_pssm(filename, window_size=19, scale=piecewise_scaling_func):
             sequences = []
             for __ in xrange(m):
                 line = f.readline()
-                sequences += [scale(int(line[i*3:i*3+3])) for i in xrange(20)]
+                sequences += [scale(float(line[i*3:i*3+3])) for i in xrange(20)]
 
             double_end = ([0.]*20) * (window_size/2)
             sequences = double_end + sequences + double_end
