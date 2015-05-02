@@ -3,6 +3,7 @@ import theano.tensor as T
 import numpy as np
 
 import data
+from measure import AccuracyTable
 
 
 def floatX(X):
@@ -85,22 +86,6 @@ def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
     return train, predict
 
 
-class Accuracy():
-
-    def __init__(self, pred=None, obs=None):
-        self.table = np.zeros(shape=(3, 3), dtype=float)
-        if pred is not None and obs is not None:
-            self.count(pred, obs)
-
-    def count(self, pred, obs):
-        for i in range(len(pred)):
-            self.table[obs[i]][pred[i]] += 1
-
-    @property
-    def Q3(self):
-        return self.table.trace() / self.table.sum() * 100
-
-
 def train_model(num_epochs=1, batch_size=1):
     print '... training model (batch_size = %d)' % batch_size
 
@@ -111,7 +96,7 @@ def train_model(num_epochs=1, batch_size=1):
 
     cost_list = []
     for i in range(num_epochs):
-        A_train = Accuracy()
+        A_train = AccuracyTable()
         for j in range(len(index) - 1):
             cost, Y_pred = train(index[j], index[j+1])
             cost_list.append(cost)
@@ -120,7 +105,7 @@ def train_model(num_epochs=1, batch_size=1):
 
         Y_pred = predict(0, m_test)
         Y_obs = np.argmax(Y_test.get_value(borrow=True), axis=1)
-        A_test = Accuracy(Y_pred, Y_obs)
+        A_test = AccuracyTable(Y_pred, Y_obs)
 
         print 'epoch %2d/%d. Loss: %f, Q3_train: %.3f%%, Q3_test: %.3f%%.' % \
             (i+1, num_epochs, np.average(cost_list), A_train.Q3, A_test.Q3)
@@ -132,8 +117,8 @@ def shared_dataset(data_xy, borrow=True):
     return shared_x, shared_y, index
 
 if __name__ == '__main__':
-    train_file = 'data/astral30_pssm.data'
-    test_file = 'data/astral30_pssm.data'
+    train_file = 'data/casp9_pssm.data'
+    test_file = 'data/casp9_pssm.data'
     window_size = 19
 
     hidden_layer_size = 100
