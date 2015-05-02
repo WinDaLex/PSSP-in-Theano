@@ -1,3 +1,5 @@
+import sys
+import datetime
 import theano
 import theano.tensor as T
 import numpy as np
@@ -117,6 +119,10 @@ def shared_dataset(data_xy, borrow=True):
     return shared_x, shared_y, index
 
 if __name__ == '__main__':
+    print datetime.datetime.now()
+    if len(sys.argv) >= 2:
+        print "Label:", sys.argv[1]
+
     train_file = 'data/casp9_pssm.data'
     test_file = 'data/casp9_pssm.data'
     window_size = 19
