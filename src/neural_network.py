@@ -1,7 +1,6 @@
 import theano
 import theano.tensor as T
 import numpy as np
-import matplotlib.pyplot as plt
 
 import data
 
@@ -102,15 +101,8 @@ class Accuracy():
         return self.table.trace() / self.table.sum() * 100
 
 
-def train_model(num_epochs=1, batch_size=1, draw=False):
+def train_model(num_epochs=1, batch_size=1):
     print '... training model (batch_size = %d)' % batch_size
-
-    if draw:
-        plt.axis([0, num_epochs, 0, 2])
-        plt.xlabel('Epoch No.')
-        plt.ylabel('Error')
-        plt.ion()
-        plt.show()
 
     m_train = X_train.get_value(borrow=True).shape[0]
     m_test = X_test.get_value(borrow=True).shape[0]
@@ -132,10 +124,6 @@ def train_model(num_epochs=1, batch_size=1, draw=False):
 
         print 'epoch %2d/%d. Loss: %f, Q3_train: %.3f%%, Q3_test: %.3f%%.' % \
             (i+1, num_epochs, np.average(cost_list), A_train.Q3, A_test.Q3)
-
-        if draw:
-            plt.scatter(i, np.average(cost_list))
-            plt.draw()
 
 def shared_dataset(data_xy, borrow=True):
     data_x, data_y, index = data_xy
