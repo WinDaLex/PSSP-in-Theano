@@ -1,12 +1,13 @@
 import sys
 import datetime
+import cPickle
 import theano
 import theano.tensor as T
 import numpy as np
 
 import data
 from measure import AccuracyTable
-
+from model import MultilayerPerceptron
 
 def floatX(X):
     return np.asarray(X, dtype=theano.config.floatX)
@@ -14,19 +15,7 @@ def floatX(X):
 def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
                 L1_reg=0.00, L2_reg=0.0001):
 
-    def init_weights_sigmoid(shape):
-        low = -np.sqrt(6./(shape[0]+shape[1])) * 4.
-        high = np.sqrt(6./(shape[0]+shape[1])) * 4.
-        values = np.random.uniform(low=low, high=high, size=shape)
-        return theano.shared(floatX(values), borrow=True)
-
-    def init_weights(shape):
-        values = np.random.randn(*shape)*0.01
-        return theano.shared(floatX(values), borrow=True)
-
-    def init_bias(shape):
-        values = np.zeros(shape, dtype=theano.config.floatX)
-        return theano.shared(values, borrow=True)
+    global classifier
 
     def sgd(cost, params):
         grads = T.grad(cost=cost, wrt=params)
@@ -35,10 +24,6 @@ def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
             updates.append([param, param - learning_rate*grad])
         return updates
 
-    def model(X, w_h, b_h, w_o, b_o):
-        h = T.nnet.sigmoid(T.dot(X, w_h) + b_h)
-        return T.nnet.softmax(T.dot(h, w_o) + b_o)
-
     print '... building model (%d-%d-%d)' % (window_size*20, hidden_layer_size, 3)
 
     X = T.matrix()
@@ -46,28 +31,18 @@ def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
 
     input_layer_size = window_size * 20
     output_layer_size = 3
-    w_h = init_weights_sigmoid((input_layer_size, hidden_layer_size))
-    b_h = init_bias(hidden_layer_size)
-    w_o = init_weights((hidden_layer_size, output_layer_size))
-    b_o = init_bias(output_layer_size)
 
-    py_x = model(X, w_h, b_h, w_o, b_o)
-    y_pred = T.argmax(py_x, axis=1)
+    classifier = MultilayerPerceptron(input_layer_size, hidden_layer_size, output_layer_size, X)
+    cost = classifier.negative_log_likelihood(Y) + L1_reg*classifier.L1 + L2_reg*classifier.L2_sqr
 
-    NLL = -T.mean(T.log(py_x)[T.arange(Y.shape[0]), T.argmax(Y, axis=1)])
-    L1 = T.sum(abs(w_h)) + T.sum(abs(w_o))
-    L2_sqr = T.sum((w_h**2)) + T.sum((w_o**2))
-    cost = NLL + L1_reg*L1 + L2_reg*L2_sqr
-
-    params = [w_h, b_h, w_o, b_o]
-    updates = sgd(cost, params)
+    updates = sgd(cost, classifier.params)
 
     start = T.lscalar()
     end = T.lscalar()
 
     train = theano.function(
         inputs=[start, end],
-        outputs=[cost, y_pred],
+        outputs=[cost, classifier.y_pred],
         updates=updates,
         givens={
             X: X_train[start:end],
@@ -78,7 +53,7 @@ def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
 
     predict = theano.function(
         inputs=[start, end],
-        outputs=y_pred,
+        outputs=classifier.y_pred,
         givens={
             X: X_test[start:end]
         },
@@ -90,7 +65,7 @@ def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
 
 def train_model(num_epochs=1, batch_size=1):
     print '... training model (batch_size = %d)' % batch_size
-
+ 
     m_train = X_train.get_value(borrow=True).shape[0]
     m_test = X_test.get_value(borrow=True).shape[0]
 
@@ -109,7 +84,7 @@ def train_model(num_epochs=1, batch_size=1):
         Y_obs = np.argmax(Y_test.get_value(borrow=True), axis=1)
         A_test = AccuracyTable(Y_pred, Y_obs)
 
-        print 'epoch %2d/%d. Loss: %f, Q3_train: %.3f%%, Q3_test: %.3f%%.' % \
+        print 'epoch %3d/%d. Loss: %f, Q3_train: %.3f%%, Q3_test: %.3f%%.' % \
             (i+1, num_epochs, np.average(cost_list), A_train.Q3, A_test.Q3)
 
 def shared_dataset(data_xy, borrow=True):
@@ -130,18 +105,17 @@ if __name__ == '__main__':
     hidden_layer_size = 100
     learning_rate = 0.03
 
-    num_epochs = 1000
+    num_epochs = 10
     batch_size = 20
 
     X_train, Y_train, index_train = shared_dataset(data.load_pssm(train_file, window_size=window_size))
     X_test, Y_test, index_test = shared_dataset(data.load_pssm(test_file, window_size=window_size))
 
-    train, predict = build_model(
-        window_size=window_size,
-        hidden_layer_size=hidden_layer_size,
-        learning_rate=learning_rate
-    )
+    train, predict = build_model(window_size=window_size, hidden_layer_size=hidden_layer_size, learning_rate=learning_rate)
 
     train_model(num_epochs=num_epochs, batch_size=batch_size)
+
+    with open('obj.save', 'wb') as f:
+        cPickle.dump(classifier, f)
 
     print '\nDone!'
