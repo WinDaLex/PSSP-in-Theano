@@ -53,9 +53,10 @@ def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
 
     predict = theano.function(
         inputs=[start, end],
-        outputs=classifier.y_pred,
+        outputs=[cost, classifier.y_pred],
         givens={
-            X: X_test[start:end]
+            X: X_valid[start:end],
+            Y: Y_valid[start:end]
         },
         allow_input_downcast=True
     )
@@ -67,25 +68,41 @@ def train_model(num_epochs=1, batch_size=1):
     print '... training model (batch_size = %d)' % batch_size
  
     m_train = X_train.get_value(borrow=True).shape[0]
-    m_test = X_test.get_value(borrow=True).shape[0]
+    m_valid = X_valid.get_value(borrow=True).shape[0]
 
+
+    stopping_threshold = 3
+    validation_frequency = 5
+    best_validation_loss = np.inf
+    stopping_count = 0
+
+    losses = []
     index = range(0, m_train+1, batch_size)
-
-    cost_list = []
     for i in range(num_epochs):
         A_train = AccuracyTable()
         for j in range(len(index) - 1):
-            cost, Y_pred = train(index[j], index[j+1])
-            cost_list.append(cost)
+            loss, Y_pred = train(index[j], index[j+1])
+            losses.append(loss)
             Y_obs = np.argmax(Y_train.get_value(borrow=True)[index[j]:index[j+1]], axis=1)
             A_train.count(Y_pred, Y_obs)
 
-        Y_pred = predict(0, m_test)
-        Y_obs = np.argmax(Y_test.get_value(borrow=True), axis=1)
-        A_test = AccuracyTable(Y_pred, Y_obs)
+        print 'epoch %3d. Loss: %f, Q3_train: %.3f%%.' % \
+            (i+1, np.average(losses), A_train.Q3)
 
-        print 'epoch %3d/%d. Loss: %f, Q3_train: %.3f%%, Q3_test: %.3f%%.' % \
-            (i+1, num_epochs, np.average(cost_list), A_train.Q3, A_test.Q3)
+        if ((i + 1) % validation_frequency == 0):
+            this_validation_loss, Y_pred = predict(0, m_valid)
+            Y_obs = np.argmax(Y_valid.get_value(borrow=True), axis=1)
+            A_valid = AccuracyTable(Y_pred, Y_obs)
+            print '%f %.3f%%' % (this_validation_loss, A_valid.Q3)
+            if this_validation_loss < best_validation_loss:
+                best_validation_loss = this_validation_loss
+                stopping_count = 0
+            else:
+                stopping_count += 1
+
+        if stopping_count >= stopping_threshold:
+            break
+
 
 def shared_dataset(data_xy, borrow=True):
     data_x, data_y, index = data_xy
@@ -98,18 +115,18 @@ if __name__ == '__main__':
     if len(sys.argv) >= 2:
         print "Label:", sys.argv[1]
 
-    train_file = 'data/casp9_pssm.data'
-    test_file = 'data/casp9_pssm.data'
+    train_file = 'data/astral30.pssm'
+    valid_file = 'data/casp9.pssm'
     window_size = 19
 
     hidden_layer_size = 100
     learning_rate = 0.03
 
-    num_epochs = 10
+    num_epochs = 500
     batch_size = 20
 
     X_train, Y_train, index_train = shared_dataset(data.load_pssm(train_file, window_size=window_size))
-    X_test, Y_test, index_test = shared_dataset(data.load_pssm(test_file, window_size=window_size))
+    X_valid, Y_valid, index_valid = shared_dataset(data.load_pssm(valid_file, window_size=window_size))
 
     train, predict = build_model(window_size=window_size, hidden_layer_size=hidden_layer_size, learning_rate=learning_rate)
 
