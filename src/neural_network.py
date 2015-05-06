@@ -122,7 +122,7 @@ if __name__ == '__main__':
     hidden_layer_size = 100
     learning_rate = 0.03
 
-    num_epochs = 500
+    num_epochs = 5
     batch_size = 20
 
     X_train, Y_train, index_train = shared_dataset(data.load_pssm(train_file, window_size=window_size))
@@ -132,7 +132,7 @@ if __name__ == '__main__':
 
     train_model(num_epochs=num_epochs, batch_size=batch_size)
 
-    with open('obj.save', 'wb') as f:
+    with open(str(datetime.datetime.now())[:19] + '.nn', 'wb') as f:
         cPickle.dump(classifier, f)
 
     print '\nDone!'
