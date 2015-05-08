@@ -76,9 +76,9 @@ def train_model(num_epochs=1, batch_size=1):
     best_validation_loss = np.inf
     stopping_count = 0
 
-    losses = []
     index = range(0, m_train+1, batch_size)
     for i in range(num_epochs):
+        losses = []
         A_train = AccuracyTable()
         for j in range(len(index) - 1):
             loss, Y_pred = train(index[j], index[j+1])
