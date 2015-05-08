@@ -1,3 +1,6 @@
+import numpy as np
+import theano
+
 RESIDUES_CLASS = ('A', 'R', 'N', 'D', 'C', 'E', 'Q', 'G', 'H', 'I', 'L', 'K',
                   'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V')
 
@@ -73,3 +76,15 @@ def load_pssm(filename, window_size=19, scale=piecewise_scaling_func):
             index.append(index[-1] + m)
 
     return X, Y, index
+
+
+def floatX(X):
+    return np.asarray(X, dtype=theano.config.floatX)
+
+def shared_dataset(data_xy, borrow=True):
+    data_x, data_y, index = data_xy
+    shared_x = theano.shared(floatX(data_x), borrow=borrow)
+    shared_y = theano.shared(floatX(data_y), borrow=borrow)
+    return shared_x, shared_y, index
+
+

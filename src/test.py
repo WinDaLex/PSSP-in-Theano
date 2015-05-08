@@ -6,7 +6,7 @@ import theano.tensor as T
 import data
 from measure import AccuracyTable
 
-test_file = 'data/casp9_pssm.data'
+test_file = 'data/casp9.pssm'
 
 X_test, Y_test, index_test = data.load_pssm(test_file)
 
