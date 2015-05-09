@@ -23,31 +23,33 @@ def init_bias(shape):
 
 class MultilayerPerceptron():
 
-    def __init__(self, n_input, n_hidden, n_output, X):
+    def __init__(self, n_input, n_hidden, n_output, L1_reg=0., L2_reg=0.0001):
         self.W_h = init_weights_sigmoid((n_input, n_hidden))
         self.b_h = init_bias(n_hidden)
         self.W_o = init_weights((n_hidden, n_output))
         self.b_o = init_bias(n_output)
 
-        self.X = X
-
-        self.py_x = self.model(X, self.W_h, self.b_h, self.W_o, self.b_o)
-        self.y_pred = T.argmax(self.py_x, axis=1)
-
         self.params = [self.W_h, self.b_h, self.W_o, self.b_o]
+    
+        self.X = T.matrix()
+        self.Y = T.matrix()
 
-    def model(self, X, W_h, b_h, W_o, b_o):
-        h = T.nnet.sigmoid(T.dot(X, W_h) + b_h)
-        return T.nnet.softmax(T.dot(h, W_o) + b_o)
+        h = T.nnet.sigmoid(T.dot(self.X, self.W_h) + self.b_h)
+        self.py_x =  T.nnet.softmax(T.dot(h, self.W_o) + self.b_o)
 
-    def negative_log_likelihood(self, Y):
-        return -T.mean(T.log(self.py_x)[T.arange(Y.shape[0]), T.argmax(Y, axis=1)])
+        self.NLL = -T.mean(T.log(self.py_x)[T.arange(self.Y.shape[0]), T.argmax(self.Y, axis=1)])
+        self.L1 = T.sum(abs(self.W_h)) + T.sum(abs(self.W_o))
+        self.L2_sqr = T.sum((self.W_h**2)) + T.sum((self.W_o**2))
+        self.cost = self.NLL + L1_reg*self.L1 + L2_reg*self.L2_sqr
 
-    @property
-    def L1(self):
-        return T.sum(abs(self.W_h)) + T.sum(abs(self.W_o))
+    def train(self, X, Y, learning_rate=0.001):
+        grads = T.grad(cost=self.cost, wrt=self.params)
+        updates = [[param, param - learning_rate*grad] for param, grad in zip(self.params, grads)]
+        start = T.lscalar()
+        end = T.lscalar()
+        return theano.function(inputs=[start, end], outputs=self.cost, updates=updates, givens={ self.X: X[start:end], self.Y: Y[start:end]})
 
-    @property
-    def L2_sqr(self):
-        return T.sum((self.W_h**2)) + T.sum((self.W_o**2))
- 
+    def predict(self, X):
+        start = T.lscalar()
+        end = T.lscalar()
+        return theano.function(inputs=[start, end], outputs=self.py_x, givens={self.X: X[start:end]})

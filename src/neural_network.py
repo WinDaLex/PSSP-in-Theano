@@ -6,70 +6,15 @@ import theano.tensor as T
 import numpy as np
 
 import data
+from data import floatX
 from measure import AccuracyTable
 from model import MultilayerPerceptron
-
-def floatX(X):
-    return np.asarray(X, dtype=theano.config.floatX)
-
-def build_model(window_size=19, hidden_layer_size=100, learning_rate=0.03,
-                L1_reg=0.00, L2_reg=0.0001):
-
-    global classifier
-
-    def sgd(cost, params):
-        grads = T.grad(cost=cost, wrt=params)
-        updates = []
-        for param, grad in zip(params, grads):
-            updates.append([param, param - learning_rate*grad])
-        return updates
-
-    print '... building model (%d-%d-%d)' % (window_size*20, hidden_layer_size, 3)
-
-    X = T.matrix()
-    Y = T.matrix()
-
-    input_layer_size = window_size * 20
-    output_layer_size = 3
-
-    classifier = MultilayerPerceptron(input_layer_size, hidden_layer_size, output_layer_size, X)
-    cost = classifier.negative_log_likelihood(Y) + L1_reg*classifier.L1 + L2_reg*classifier.L2_sqr
-
-    updates = sgd(cost, classifier.params)
-
-    start = T.lscalar()
-    end = T.lscalar()
-
-    train = theano.function(
-        inputs=[start, end],
-        outputs=[cost, classifier.y_pred],
-        updates=updates,
-        givens={
-            X: X_train[start:end],
-            Y: Y_train[start:end]
-        },
-        allow_input_downcast=True
-    )
-
-    predict = theano.function(
-        inputs=[start, end],
-        outputs=[cost, classifier.y_pred],
-        givens={
-            X: X_valid[start:end],
-            Y: Y_valid[start:end]
-        },
-        allow_input_downcast=True
-    )
-
-    return train, predict
-
 
 def train_model(num_epochs=1, batch_size=1):
     print '... training model (batch_size = %d)' % batch_size
  
     m_train = X_train.get_value(borrow=True).shape[0]
     m_valid = X_valid.get_value(borrow=True).shape[0]
-
 
     stopping_threshold = 3
     validation_frequency = 5
@@ -78,22 +23,16 @@ def train_model(num_epochs=1, batch_size=1):
 
     index = range(0, m_train+1, batch_size)
     for i in range(num_epochs):
-        losses = []
-        A_train = AccuracyTable()
-        for j in range(len(index) - 1):
-            loss, Y_pred = train(index[j], index[j+1])
-            losses.append(loss)
-            Y_obs = np.argmax(Y_train.get_value(borrow=True)[index[j]:index[j+1]], axis=1)
-            A_train.count(Y_pred, Y_obs)
-
-        print 'epoch %3d. Loss: %f, Q3_train: %.3f%%.' % \
-            (i+1, np.average(losses), A_train.Q3)
+        costs = [train(index[j], index[j+1]) for j in range(len(index)-1)]
+        print 'epoch %3d. Cost: %f' % (i+1, np.mean(costs))
 
         if ((i + 1) % validation_frequency == 0):
-            this_validation_loss, Y_pred = predict(0, m_valid)
-            Y_obs = np.argmax(Y_valid.get_value(borrow=True), axis=1)
-            A_valid = AccuracyTable(Y_pred, Y_obs)
-            print '%f %.3f%%' % (this_validation_loss, A_valid.Q3)
+            py_x = predict(0, m_valid)
+            y_pred = np.argmax(py_x, axis=1)
+            y_obs = np.argmax(Y_valid.get_value(borrow=True), axis=1)
+            A_valid = AccuracyTable(y_pred, y_obs)
+            this_validation_loss = 1 - A_valid.Q3 / 100
+            print '%f' % (this_validation_loss)
             if this_validation_loss < best_validation_loss:
                 best_validation_loss = this_validation_loss
                 stopping_count = 0
@@ -103,36 +42,37 @@ def train_model(num_epochs=1, batch_size=1):
         if stopping_count >= stopping_threshold:
             break
 
+print datetime.datetime.now()
+if len(sys.argv) >= 2:
+    print "Label:", sys.argv[1]
 
-def shared_dataset(data_xy, borrow=True):
-    data_x, data_y, index = data_xy
-    shared_x = theano.shared(floatX(data_x), borrow=borrow)
-    shared_y = theano.shared(floatX(data_y), borrow=borrow)
-    return shared_x, shared_y, index
+train_file = 'data/astral30.pssm'
+valid_file = 'data/casp9.pssm'
+window_size = 19
 
-if __name__ == '__main__':
-    print datetime.datetime.now()
-    if len(sys.argv) >= 2:
-        print "Label:", sys.argv[1]
+hidden_layer_size = 100
+learning_rate = 0.001
+L1_reg = 0.
+L2_reg = 0.0000
 
-    train_file = 'data/astral30.pssm'
-    valid_file = 'data/casp9.pssm'
-    window_size = 19
+num_epochs = 1000
+batch_size = 20
 
-    hidden_layer_size = 100
-    learning_rate = 0.03
+X_train, Y_train, index_train = data.shared_dataset(data.load_pssm(train_file, window_size=window_size))
+X_valid, Y_valid, index_valid = data.shared_dataset(data.load_pssm(valid_file, window_size=window_size))
 
-    num_epochs = 5
-    batch_size = 20
+print '... building model (%d-%d-%d)' % (window_size*20, hidden_layer_size, 3)
 
-    X_train, Y_train, index_train = shared_dataset(data.load_pssm(train_file, window_size=window_size))
-    X_valid, Y_valid, index_valid = shared_dataset(data.load_pssm(valid_file, window_size=window_size))
+input_layer_size = window_size * 20
+output_layer_size = 3
 
-    train, predict = build_model(window_size=window_size, hidden_layer_size=hidden_layer_size, learning_rate=learning_rate)
+classifier = MultilayerPerceptron(input_layer_size, hidden_layer_size, output_layer_size, L1_reg, L2_reg)
+train = classifier.train(X_train, Y_train)
+predict = classifier.predict(X_valid)
 
-    train_model(num_epochs=num_epochs, batch_size=batch_size)
+train_model(num_epochs=num_epochs, batch_size=batch_size)
 
-    with open(str(datetime.datetime.now())[:19] + '.nn', 'wb') as f:
-        cPickle.dump(classifier, f)
+with open(str(datetime.datetime.now())[:19] + '.nn', 'wb') as f:
+    cPickle.dump(classifier, f)
 
-    print '\nDone!'
+print '\nDone!'
