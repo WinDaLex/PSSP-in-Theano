@@ -52,4 +52,9 @@ class MultilayerPerceptron():
     def predict(self, X):
         start = T.lscalar()
         end = T.lscalar()
-        return theano.function(inputs=[start, end], outputs=self.py_x, givens={self.X: X[start:end]})
+        return theano.function(inputs=[start, end], outputs=self.py_x, givens={ self.X: X[start:end] })
+
+    def predict2(self, X, Y):
+        start = T.lscalar()
+        end = T.lscalar()
+        return theano.function(inputs=[start, end], outputs=[self.cost, self.py_x], givens={self.X: X[start:end], self.Y: Y[start:end]})

@@ -8,38 +8,32 @@ import numpy as np
 import data
 from data import floatX
 from measure import AccuracyTable
+from measure import StoppingCriteria
 from model import MultilayerPerceptron
 
 def train_model(num_epochs=1, batch_size=1):
-    print '... training model (batch_size = %d)' % batch_size
+    print '... training model (batch_size = %d, learning_rate = %f)' % (batch_size, learning_rate)
  
     m_train = X_train.get_value(borrow=True).shape[0]
     m_valid = X_valid.get_value(borrow=True).shape[0]
 
-    stopping_threshold = 3
-    validation_frequency = 5
-    best_validation_loss = np.inf
-    stopping_count = 0
+    stopping_criteria = StoppingCriteria()
 
     index = range(0, m_train+1, batch_size)
     for i in range(num_epochs):
         costs = [train(index[j], index[j+1]) for j in range(len(index)-1)]
+        E_tr = np.mean(costs)
         print 'epoch %3d. Cost: %f' % (i+1, np.mean(costs))
 
-        if ((i + 1) % validation_frequency == 0):
-            py_x = predict(0, m_valid)
-            y_pred = np.argmax(py_x, axis=1)
-            y_obs = np.argmax(Y_valid.get_value(borrow=True), axis=1)
-            A_valid = AccuracyTable(y_pred, y_obs)
-            this_validation_loss = 1 - A_valid.Q3 / 100
-            print '%f' % (this_validation_loss)
-            if this_validation_loss < best_validation_loss:
-                best_validation_loss = this_validation_loss
-                stopping_count = 0
-            else:
-                stopping_count += 1
+        E_va, py_x = predict(0, m_valid)
+        y_pred = np.argmax(py_x, axis=1)
+        y_obs = np.argmax(Y_valid.get_value(borrow=True), axis=1)
+        A_valid = AccuracyTable(y_pred, y_obs)
+ 
+        stopping_criteria.append(E_tr, E_va)
+        print stopping_criteria.E_va[-1], stopping_criteria.generalization_loss, stopping_criteria.training_progress
 
-        if stopping_count >= stopping_threshold:
+        if stopping_criteria.GL(1):
             break
 
 print datetime.datetime.now()
@@ -49,9 +43,9 @@ if len(sys.argv) >= 2:
 train_file = 'data/astral30.pssm'
 valid_file = 'data/casp9.pssm'
 window_size = 19
-
 hidden_layer_size = 100
-learning_rate = 0.001
+
+learning_rate = 10000
 L1_reg = 0.
 L2_reg = 0.0000
 
@@ -68,7 +62,7 @@ output_layer_size = 3
 
 classifier = MultilayerPerceptron(input_layer_size, hidden_layer_size, output_layer_size, L1_reg, L2_reg)
 train = classifier.train(X_train, Y_train)
-predict = classifier.predict(X_valid)
+predict = classifier.predict2(X_valid, Y_valid)
 
 train_model(num_epochs=num_epochs, batch_size=batch_size)
 
