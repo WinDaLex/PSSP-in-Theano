@@ -21,8 +21,7 @@ def init_bias(shape):
     return theano.shared(values, borrow=True)
 
 
-class MultilayerPerceptron():
-
+class MultilayerPerceptron(object):
     def __init__(self, n_input, n_hidden, n_output, L1_reg=0., L2_reg=0.0001):
         self.W_h = init_weights_sigmoid((n_input, n_hidden))
         self.b_h = init_bias(n_hidden)
@@ -47,14 +46,26 @@ class MultilayerPerceptron():
         updates = [[param, param - learning_rate*grad] for param, grad in zip(self.params, grads)]
         start = T.lscalar()
         end = T.lscalar()
-        return theano.function(inputs=[start, end], outputs=self.cost, updates=updates, givens={ self.X: X[start:end], self.Y: Y[start:end]})
+        return theano.function(
+            inputs=[start, end],
+            outputs=self.cost,
+            updates=updates,
+            givens={self.X: X[start:end],
+                    self.Y: Y[start:end]})
+
+    def validate(self, X, Y):
+        start = T.lscalar()
+        end = T.lscalar()
+        return theano.function(
+            inputs=[start, end],
+            outputs=[self.cost, self.py_x],
+            givens={self.X: X[start:end],
+                    self.Y: Y[start:end]})
 
     def predict(self, X):
         start = T.lscalar()
         end = T.lscalar()
-        return theano.function(inputs=[start, end], outputs=self.py_x, givens={ self.X: X[start:end] })
-
-    def predict2(self, X, Y):
-        start = T.lscalar()
-        end = T.lscalar()
-        return theano.function(inputs=[start, end], outputs=[self.cost, self.py_x], givens={self.X: X[start:end], self.Y: Y[start:end]})
+        return theano.function(
+            inputs=[start, end],
+            outputs=self.py_x,
+            givens={self.X: X[start:end]})
