@@ -1,7 +1,22 @@
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function
+
 import sys
 import datetime
-import cPickle
-import ConfigParser
+
+try:
+    import ConfigParser as configparser
+    import cPickle as pickle
+except ImportError:
+    import configparser
+    import pickle
+
+try:
+    input = raw_input
+    range = xrange
+except NameError:
+    pass
 
 import numpy as np
 import theano
@@ -13,13 +28,13 @@ from measure import StoppingCriteria
 from model import MultilayerPerceptron
 
 
-print datetime.datetime.now()
+print(datetime.datetime.now())
 if len(sys.argv) >= 2:
-    print "Label:", sys.argv[1]
+    print("Label:", sys.argv[1])
 
 # load config file
 
-config = ConfigParser.RawConfigParser()
+config = configparser.RawConfigParser()
 config.read('first-level.cfg')
 
 train_file = config.get('FILE', 'training_file')
@@ -41,7 +56,7 @@ X_valid, Y_valid, index_valid = data.load_pssm(valid_file, window_size=window_si
 
 # build model
 
-print '... building model (%d-%d-%d)' % (window_size*20, hidden_layer_size, 3)
+print('... building model (%d-%d-%d)' % (window_size*20, hidden_layer_size, 3))
 
 input_layer_size = window_size * 20
 output_layer_size = 3
@@ -52,7 +67,7 @@ predict = classifier.validate(X_valid, Y_valid)
 
 # train model
 
-print '... training model (batch_size = %d, learning_rate = %f)' % (batch_size, learning_rate)
+print('... training model (batch_size = %d, learning_rate = %f)' % (batch_size, learning_rate))
 
 m_train = X_train.get_value(borrow=True).shape[0]
 m_valid = X_valid.get_value(borrow=True).shape[0]
@@ -70,23 +85,23 @@ for i in range(num_epochs):
     A_valid = AccuracyTable(y_pred, y_obs)
 
     stopping_criteria.append(E_tr, E_va)
-    print 'epoch %3d/%d. Cost: %f Q3_valid: %.2f%%' % (
+    print('epoch %3d/%d. Cost: %f Q3_valid: %.2f%%' % (
         i+1, num_epochs,
-        E_tr, A_valid.Q3),
-    print 'E_valid: %.4f, GL: %.4f, TR: %.4f' % (
+        E_tr, A_valid.Q3), end=' ')
+    print('E_valid: %.4f, GL: %.4f, TR: %.4f' % (
         stopping_criteria.E_va[-1],
         stopping_criteria.generalization_loss,
-        stopping_criteria.training_progress)
+        stopping_criteria.training_progress))
 
     if stopping_criteria.PQ(1):
-        print 'Early Stopping!'
+        print('Early Stopping!')
         break
 
 # save model
 
 filename = str(datetime.datetime.now())[:19] + '.nn'
-print '... saving model in file (%s)' % filename
-with open(filename, 'wb') as f:
-    cPickle.dump(classifier, f)
+print('... saving model in file (%s)' % filename)
 
-print '\nDone!'
+pickle.dump(classifier, open(filename, 'wb'))
+
+print('\nDone!')

@@ -1,5 +1,17 @@
-import cPickle
-import ConfigParser
+from __future__ import print_function
+
+try:
+    import ConfigParser as configparser
+    import cPickle as pickle
+except ImportError:
+    import configparser
+    import pickle
+
+try:
+    input = raw_input
+    range = xrange
+except NameError:
+    pass
 
 import numpy as np
 import theano
@@ -23,9 +35,9 @@ def get_XY(filename):
 def transform(x, m, window_size=17):
     double_end = [0.] * 3 * (window_size / 2)
     sequences = double_end + x.tolist()[0] + double_end
-    return [sequences[index : index+window_size*3] for index in xrange(0, m*3, 3)]
+    return [sequences[index : index+window_size*3] for index in range(0, m*3, 3)]
 
-config = ConfigParser.RawConfigParser()
+config = configparser.RawConfigParser()
 config.read('second-level.cfg')
 
 network_file = config.get('FILE', 'network_file')
@@ -42,8 +54,7 @@ L2_reg = config.getfloat('TRAINING', 'l2_reg')
 num_epochs = config.getint('TRAINING', 'num_epochs')
 batch_size = config.getint('TRAINING', 'batch_size')
 
-with open(network_file, 'rb') as f:
-    fst_layer_classifier = cPickle.load(f)
+fst_layer_classifier = pickle.load(open(network_file, 'r'))
 
 X_train, Y_train, index_train = get_XY(train_file)
 X_valid, Y_valid, index_valid = get_XY(valid_file)
@@ -69,10 +80,10 @@ for i in range(num_epochs):
 
     stopping_criteria.append(E_tr, E_va)
 
-    print 'epoch %3d\%d. train cost: %f, Q3_valid: %.3f%%. %f %f %f' % \
-        (i+1, num_epochs, np.mean(costs), A_valid.Q3, E_va, stopping_criteria.generalization_loss, stopping_criteria.training_progress)
+    print('epoch %3d\%d. train cost: %f, Q3_valid: %.3f%%. %f %f %f' % \
+        (i+1, num_epochs, np.mean(costs), A_valid.Q3, E_va, stopping_criteria.generalization_loss, stopping_criteria.training_progress))
 
     if stopping_criteria.PQ(1):
-        print 'Stop Early!'
+        print('Stop Early!')
         break
 
