@@ -1,15 +1,14 @@
 import numpy as np
 import theano
 
-RESIDUES_CLASS = ('A', 'R', 'N', 'D', 'C', 'E', 'Q', 'G', 'H', 'I', 'L', 'K',
-                  'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V')
-
-DSSP_CLASS = ('H', 'E', 'C')
 
 def encode_residue(residue):
+    RESIDUES_CLASS = ('A', 'R', 'N', 'D', 'C', 'E', 'Q', 'G', 'H', 'I', 'L', 'K',
+                      'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V')
     return [1 if residue == RESIDUES_CLASS[i] else 0 for i in xrange(20)]
 
 def encode_dssp(dssp):
+    DSSP_CLASS = ('H', 'E', 'C')
     return [1 if dssp == DSSP_CLASS[i] else 0 for i in xrange(3)]
 
 def load(filename, window_size=19):
@@ -32,7 +31,7 @@ def load(filename, window_size=19):
                 unary_sequence += encode_residue(residue)
 
             X += [
-                unary_sequence[start:start+window_size*20]
+                unary_sequence[start : start+window_size*20]
                 for start in xrange(0, len(sequence)*20, 20)
             ]
 
@@ -40,12 +39,19 @@ def load(filename, window_size=19):
 
             index.append(index[-1] + len(sequence))
 
-    return X, Y, index
+    data_x = X
+    data_y = Y
+    shared_x = theano.shared(floatX(data_x), borrow=True)
+    shared_y = theano.shared(floatX(data_y), borrow=True)
+    return shared_x, shared_y, index
 
 def piecewise_scaling_func(x):
-    if x < -5: y = 0.0
-    elif -5 <= x <= 5: y = 0.5 + 0.1*x
-    else: y = 1.0
+    if x < -5:
+        y = 0.0
+    elif -5 <= x <= 5:
+        y = 0.5 + 0.1*x
+    else:
+        y = 1.0
     return y
 
 def load_pssm(filename, window_size=19, scale=piecewise_scaling_func):
@@ -61,7 +67,7 @@ def load_pssm(filename, window_size=19, scale=piecewise_scaling_func):
             sequences = []
             for __ in xrange(m):
                 line = f.readline()
-                sequences += [scale(float(line[i*3:i*3+3])) for i in xrange(20)]
+                sequences += [scale(float(line[i*3 : i*3+3])) for i in xrange(20)]
 
             double_end = ([0.]*20) * (window_size/2)
             sequences = double_end + sequences + double_end
@@ -75,7 +81,11 @@ def load_pssm(filename, window_size=19, scale=piecewise_scaling_func):
 
             index.append(index[-1] + m)
 
-    return X, Y, index
+    data_x = X
+    data_y = Y
+    shared_x = theano.shared(floatX(data_x), borrow=True)
+    shared_y = theano.shared(floatX(data_y), borrow=True)
+    return shared_x, shared_y, index
 
 def floatX(A):
     return np.asarray(A, dtype=theano.config.floatX)
@@ -84,4 +94,4 @@ def shared_dataset(data_xy, borrow=True):
     data_x, data_y, index = data_xy
     shared_x = theano.shared(floatX(data_x), borrow=borrow)
     shared_y = theano.shared(floatX(data_y), borrow=borrow)
-    return shared_x, shared_y, index
+    return shared_x, shared_y

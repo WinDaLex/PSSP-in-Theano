@@ -1,6 +1,7 @@
 import numpy as np
 
-class AccuracyTable():
+
+class AccuracyTable(object):
 
     def __init__(self, pred=None, obs=None):
         self.table = np.zeros(shape=(3, 3), dtype=float)
@@ -47,8 +48,7 @@ class AccuracyTable():
         return np.mean((self.Ch, self.Ce, self.Cc))
     
 
-class StoppingCriteria():
-
+class StoppingCriteria(object):
     def __init__(self, k=5):
         self.t = 0
         self.k = k
@@ -87,5 +87,3 @@ class StoppingCriteria():
         if s == 1:
             return True
         return self.UP(s - 1, t - self.k)
-    
-
