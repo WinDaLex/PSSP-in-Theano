@@ -58,4 +58,6 @@ X_train, Y_train, index_train = get_XY(train_file)
 X_valid, Y_valid, index_valid = get_XY(valid_file)
 
 snd_layer_classifier = MultilayerPerceptron(window_size*3, hidden_layer_size, 3)
-snd_layer_classifier.train_model(X_train, Y_train, X_valid, Y_valid, num_epochs, learning_rate, batch_size)
+snd_layer_classifier.train_model(X_train, Y_train, X_valid, Y_valid,
+                                 num_epochs, batch_size,
+                                 learning_rate, L1_reg, L2_reg)
