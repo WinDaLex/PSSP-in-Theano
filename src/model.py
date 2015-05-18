@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
-
-from __future__ import division, print_function
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 import numpy as np
 import theano
 import theano.tensor as T
 
 from measure import *
+
+try:
+    from itertools import izip
+except ImportError:
+    izip = zip
 
 def floatX(X):
     return np.asarray(X, dtype=theano.config.floatX)
@@ -29,7 +34,7 @@ def init_bias(shape):
 class MultilayerPerceptron(object):
     def __init__(self, n_input, n_hidden, n_output):
         print('... building model (%d-%d-%d)' %
-                (input_layer_size, hidden_layer_size, output_layer_size))
+                (n_input, n_hidden, n_output))
 
         self.W_h = init_weights_sigmoid((n_input, n_hidden))
         self.b_h = init_bias(n_hidden)
@@ -61,7 +66,7 @@ class MultilayerPerceptron(object):
  
         grads = T.grad(cost=cost, wrt=self.params)
         updates = [[param, param - learning_rate*grad]
-                for param, grad in zip(self.params, grads)]
+                   for param, grad in izip(self.params, grads)]
 
         start = T.lscalar()
         end = T.lscalar()

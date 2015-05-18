@@ -11,7 +11,7 @@ config.set('MODEL', 'window_size', '19')
 config.set('MODEL', 'hidden_layer_size', '100')
 
 config.add_section('TRAINING')
-config.set('TRAINING', 'learning_rate', '1.')
+config.set('TRAINING', 'learning_rate', '0.01')
 config.set('TRAINING', 'L1_reg', '0.')
 config.set('TRAINING', 'L2_reg', '0.')
 config.set('TRAINING', 'num_epochs', '1000')

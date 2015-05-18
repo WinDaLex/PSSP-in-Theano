@@ -7,6 +7,7 @@ import data
 from measure import AccuracyTable
 
 test_file = 'data/casp9.pssm'
+test_file2 = 'data/astral30.pssm'
 
 X_test, Y_test, index_test = data.shared_dataset(data.load_pssm(test_file))
 m_test = len(index_test) - 1

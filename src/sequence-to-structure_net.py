@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
-
-from __future__ import print_function
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 import sys
 import datetime
+
+import data
+from model import MultilayerPerceptron
 
 try:
     import ConfigParser as configparser
@@ -11,9 +14,6 @@ try:
 except ImportError:
     import configparser
     import pickle
-
-import data
-from model import MultilayerPerceptron
 
 
 current_time = datetime.datetime.now()

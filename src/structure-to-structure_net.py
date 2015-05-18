@@ -1,4 +1,13 @@
-from __future__ import print_function
+# -*- coding: utf-8 -*-
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+
+import theano
+
+import data
+from model import MultilayerPerceptron
+from measure import AccuracyTable
+from measure import StoppingCriteria
 
 try:
     import ConfigParser as configparser
@@ -13,27 +22,20 @@ try:
 except NameError:
     pass
 
-import theano
-
-import data
-from model import MultilayerPerceptron
-from measure import AccuracyTable
-from measure import StoppingCriteria
-
+def transform(x, m, window_size=17):
+    double_end = [0.] * 3 * (window_size // 2)
+    sequences = double_end + x.tolist()[0] + double_end
+    return [sequences[index : index+window_size*3]
+            for index in range(0, m*3, 3)]
 
 def get_XY(filename):
-    X_data, Y, index = data.load_pssm(filename)
+    X_data, Y_data, index = data.load_pssm(filename)
     m = X_data.get_value(borrow=True).shape[0]
     predict = fst_layer_classifier.predict(X_data)
     x = predict(0, m).reshape(1, m*3)
     x = transform(x, m, window_size)
     X = theano.shared(data.floatX(x), borrow=True)
-    return X, Y, index
-
-def transform(x, m, window_size=17):
-    double_end = [0.] * 3 * (window_size / 2)
-    sequences = double_end + x.tolist()[0] + double_end
-    return [sequences[index : index+window_size*3] for index in range(0, m*3, 3)]
+    return X, Y_data, index
 
 config = configparser.RawConfigParser()
 config.read('second-level.cfg')

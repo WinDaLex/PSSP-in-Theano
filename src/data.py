@@ -1,22 +1,24 @@
-from __future__ import division, print_function
+# -*- coding: utf-8 -*-
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+
+import numpy as np
+import theano
+
 try:
     input = raw_input
     range = xrange
 except NameError:
     pass
 
-import numpy as np
-import theano
-
-
 def encode_residue(residue):
-    RESIDUES_CLASS = ('A', 'R', 'N', 'D', 'C', 'E', 'Q', 'G', 'H', 'I', 'L', 'K',
-                      'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V')
-    return [1 if residue == RESIDUES_CLASS[i] else 0 for i in range(20)]
+    return [1 if residue == amino_acid else 0
+            for amino_acid in ('A', 'R', 'N', 'D', 'C', 'E', 'Q', 'G', 'H',
+                               'I', 'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W',
+                               'Y', 'V')]
 
 def encode_dssp(dssp):
-    DSSP_CLASS = ('H', 'E', 'C')
-    return [1 if dssp == DSSP_CLASS[i] else 0 for i in range(3)]
+    return [1 if dssp == hec else 0 for hec in ('H', 'E', 'C')]
 
 def load(filename, window_size=19):
     print('... loading data ("%s")' % filename)
