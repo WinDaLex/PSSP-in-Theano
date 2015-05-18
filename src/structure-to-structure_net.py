@@ -54,7 +54,7 @@ L2_reg = config.getfloat('TRAINING', 'l2_reg')
 num_epochs = config.getint('TRAINING', 'num_epochs')
 batch_size = config.getint('TRAINING', 'batch_size')
 
-fst_layer_classifier = pickle.load(open(network_file, 'r'))
+fst_layer_classifier = pickle.load(open(network_file, 'rb'))
 
 X_train, Y_train, index_train = get_XY(train_file)
 X_valid, Y_valid, index_valid = get_XY(valid_file)
